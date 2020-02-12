@@ -1,0 +1,82 @@
+{
+  "TableName": "bond",
+  "BillingMode": "PAY_PER_REQUEST",
+  "KeySchema": [
+    {
+      "AttributeName": "bond_id",
+      "KeyType": "HASH"
+    }
+  ],
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "bond_id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "host_cost_center",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "host_account_id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "sub_cost_center",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "sub_account_id",
+      "AttributeType": "S"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "bond-host_cost_center-index",
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "KeySchema": [
+        {
+          "KeyType": "HASH",
+          "AttributeName": "host_cost_center"
+        }
+      ]
+    },
+    {
+      "IndexName": "bond-host_account_id-index",
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "KeySchema": [
+        {
+          "KeyType": "HASH",
+          "AttributeName": "host_account_id"
+        }
+      ]
+    },
+    {
+      "IndexName": "bond-sub_cost_center-index",
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "KeySchema": [
+        {
+          "KeyType": "HASH",
+          "AttributeName": "sub_cost_center"
+        }
+      ]
+    },
+    {
+      "IndexName": "bond-sub_account_id-index",
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "KeySchema": [
+        {
+          "KeyType": "HASH",
+          "AttributeName": "sub_account_id"
+        }
+      ]
+    }
+  ]
+}
