@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  dynamodb-local:
+      container_name: dynamodb-local
+      image: amazon/dynamodb-local:1.11.477
+      volumes:
+        - .:/usr/src/scripts
+      ports:
+        - 8000:8000
+
+  bond-registry:
+      container_name: bond-registry
+      build: .
+      volumes:
+        - .:/app
+      ports:
+        - 5000:8080
+      depends_on:
+        - dynamodb-local
+      environment:
+        - IS_OFFLINE=True
+        - MODULE_NAME=registry.main
+        - HOST=0.0.0.0
+        - PORT=8080
