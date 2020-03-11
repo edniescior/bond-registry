@@ -3,6 +3,7 @@ A module that presents a data service (REST API) for interacting with the bond
 registry.
 
 Available functions:
+- health_check: Return OK
 - get_bonds: Return all bonds in the registry that match the search criteria.
 - get_bond: Return a specific bond.
 - create_bond: Create a bond.
@@ -18,6 +19,24 @@ from registry.models import Bond, Subscriber
 from registry.db import ConditionalCheckError, RegistryClientError
 
 app = FastAPI()
+
+
+@app.get("/health_check")
+def health_check():
+    """
+    Check if the registry is healthy. Pings the backend to make sure
+    it is responding.
+
+    Returns:
+         200 OK
+         500 Unhealthy
+    """
+    # try to fetch a bogus bond to check the backend.
+    try:
+        crud.get_bond("_fake_")
+    except RegistryClientError as err:
+        raise HTTPException(status_code=500, detail=str(err))
+    return "OK"
 
 
 @app.get("/bonds")

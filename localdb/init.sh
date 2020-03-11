@@ -34,7 +34,7 @@ AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY \
 aws dynamodb query \
     --table-name bond \
     --key-condition-expression "bond_id = :v1" \
-    --expression-attribute-values "{ \":v1\" : { \"S\" : \"TEST007\" } }" \
+    --expression-attribute-values "{ \":v1\" : { \"S\" : \"FOO\" } }" \
 	--endpoint-url http://0.0.0.0:8000 --region us-west-2
 
  # AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID \

@@ -3,7 +3,6 @@ import os
 import json
 import boto3
 from boto3.dynamodb.conditions import Key
-from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
 from fastapi.encoders import jsonable_encoder
 

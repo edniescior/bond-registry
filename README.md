@@ -52,7 +52,8 @@ The data model looks something like this:
 
 ## Pre-requisites
 ```
-Docker
+Make
+Docker and Docker Compose
 AWS CLI
 ```
 
@@ -88,32 +89,32 @@ bond-registry    /start.sh                        Up      80/tcp, 0.0.0.0:5000->
 dynamodb-local   java -jar DynamoDBLocal.ja ...   Up      0.0.0.0:8000->8000/tcp  
 ```
 
-Testing it via curl should give us: `curl -X GET "http://localhost:5000/bonds/TEST007" -H "accept: application/json"`
+Testing it via curl should give us: `curl -X GET "http://localhost:5000/bonds/FOO" -H "accept: application/json"`
 
 ```json
-{ 
-   "bond_id":"TEST007",
-   "host_account_id":"QIOK20853445912302",
-   "sub_account_id":"KMMI39246229932687",
-   "host_cost_center":"gray",
-   "sub_cost_center":"olive",
-   "subscribers":{ 
-      "gregorykeller":{ 
-         "sid":"gregorykeller",
-         "name":"Troy Nolan",
-         "email":"kellyjohnson@gmail.com"
-      },
-      "qking":{ 
-         "sid":"qking",
-         "name":"Brian Schneider",
-         "email":"sullivanangela@hotmail.com"
-      },
-      "cooperchristina":{ 
-         "sid":"cooperchristina",
-         "name":"James Nash",
-         "email":"jenniferklein@yahoo.com"
-      }
-   }
+{
+  "bond_id": "FOO",
+  "host_account_id": "TAPV54703350425479",
+  "sub_account_id": "IMII87361536320662",
+  "host_cost_center": "olive",
+  "sub_cost_center": "blue",
+  "subscribers": {
+    "aaronorr": {
+      "sid": "aaronorr",
+      "name": "Lori Rodriguez",
+      "email": "mistymoore@yahoo.com"
+    },
+    "christopherwashington": {
+      "sid": "christopherwashington",
+      "name": "David Watkins",
+      "email": "patrickbaker@hotmail.com"
+    },
+    "jessicadavis": {
+      "sid": "jessicadavis",
+      "name": "Emily Garrett",
+      "email": "walter59@yahoo.com"
+    }
+  }
 }
 ```
 I can view the OpenAPI docs at `http://localhost:5000/docs`.
@@ -174,11 +175,20 @@ To deactivate it: ```deactivate```
 To install the packages needed, run: ```pip install -r requirements.txt```
 
 ## Testing
-### Unit Tests
-
-To run unit tests execute: ```python -m pytest tests/unit/test_*```
-
+### Linting
 To test PEP8 compliance, run:
 ```shell script
 pycodestyle --show-source --show-pep8 registry/ tests/
 ```
+
+### Unit Tests
+
+To run unit tests execute: ```python -m pytest tests/unit/test_*```
+
+### Integration Tests
+
+We use the ```testcontainers``` package to launch docker containers for the registry service and dynamodb
+back end that make up the test environment. It takes a few seconds to launch and testing pauses until the environment 
+is ready. Once the tests have run to completion, the containers are shut down.
+
+To run integration tests execute: ```python -m pytest tests/integration/test_*```

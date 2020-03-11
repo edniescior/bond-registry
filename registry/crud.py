@@ -341,7 +341,7 @@ def add_subscriber(bond_id: str, sub: Subscriber) -> Bond:
     bond = get_bond(bond_id)
     if bond is None:
         raise ConditionalCheckError(f'Bond {bond_id} not found. '
-                                    f'Cannot add subscriber {sub}')
+                                    f'Cannot add subscriber {sub.sid}.')
     bond.add_subscriber(sub)
     return update_bond(bond)
 
@@ -364,6 +364,6 @@ def remove_subscriber(bond_id: str, sid: str) -> Bond:
     bond = get_bond(bond_id)
     if bond is None:
         raise ConditionalCheckError(f'Bond {bond_id} not found. '
-                                    f'Cannot remove subscriber {sid}')
+                                    f'Cannot remove subscriber {sid}.')
     bond.remove_subscriber(sid)
     return update_bond(bond)

@@ -1,7 +1,7 @@
 #
 # Generate randomized test data for the bond table in dynamodb.
 #
-# DynamoDB batch write is limited to 25 items, so we cap it there for now.
+# Note: DynamoDB batch write is limited to 25 items.
 #
 import argparse
 import json
@@ -16,8 +16,12 @@ parser.add_argument('Records',
                     metavar='num_records',
                     type=int,
                     help='the number of records to generate (max = 25)')
+parser.add_argument('-o',
+                    metavar='out_file',
+                    type=str,
+                    help='Path to output file.')
 args = parser.parse_args()
-num_records = args.Records if args.Records <= 25 else 25  # cap at 25 records
+num_records = args.Records
 
 # fake data generator setup
 fake = Faker()
@@ -25,38 +29,51 @@ fake.add_provider(profile)
 fake.add_provider(bank)
 fake.add_provider(color)
 
-records = []
-for rec in range(num_records):
 
-    subList = {}
-    for i in range(0, random.randint(0, 7)):
-        p = fake.profile()
-        sub = {
-            "M": {
-                "name": {"S": p["name"]},
-                "email": {"S": p["mail"]},
-                "sid": {"S": p["username"]}
-            }
-        }
-        subList[p["username"]] = sub
-
-    record = {
-        "PutRequest": {
-            "Item": {
-                "bond_id": {"S": "TEST007" if rec == 0 else fake.md5()},
-                "host_account_id": {"S": fake.bban()},
-                "sub_account_id": {"S": fake.bban()},
-                "host_cost_center": {"S": fake.safe_color_name()},
-                "sub_cost_center": {"S": fake.safe_color_name()},
-                "subscribers": {
-                    "M": subList
+def gen_item(faker: Faker):
+    def gen_random_subs():
+        """
+        Generate a random number of subscribers (0 to 7) and
+        return as a map.
+        """
+        def gen_sub() -> dict:
+            p = faker.profile()
+            return {
+                "M": {
+                    "name": {"S": p['name']},
+                    "email": {"S": p['mail']},
+                    "sid": {"S": p['username']}
                 }
             }
-        }
+
+        subscribers = {'M': {}}
+        for i in range(0, random.randint(0, 7)):
+            sub = gen_sub()
+            subscribers['M'][sub['M']['sid']['S']] = sub
+        return subscribers
+
+    return {
+            "PutRequest": {
+                "Item": {
+                    "bond_id": {"S": fake.md5()},
+                    "host_account_id": {"S": fake.bban()},
+                    "sub_account_id": {"S": fake.bban()},
+                    "host_cost_center": {"S": fake.safe_color_name()},
+                    "sub_cost_center": {"S": fake.safe_color_name()},
+                    "subscribers": gen_random_subs()
+                }
+            }
     }
-    records.append(record)
 
-data = {"bond": records}
 
-with open("02-load-data.json", "w") as write_file:
-    json.dump(data, write_file)
+data = {"bond": []}
+for item in (gen_item(fake) for i in range(num_records)):
+    data['bond'].append(item)
+
+
+# pretty print to STDOUT if no output file was provided.
+if not args.o:
+    print(json.dumps(data, sort_keys=True, indent=4))
+else:
+    with open(args.o, "w") as write_file:
+        json.dump(data, write_file)
