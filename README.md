@@ -9,7 +9,7 @@ the host. It is shorthand for a 'charge-back relationship'.
 The finished project will be a Python API (built on FastAPI) running in a
 Docker container that speaks to Dynamodb as the back end.
 
-## The Data
+## The Data Model
 The natural key for a bond is a composite of host account id and subscriber
 account id.
 
@@ -21,7 +21,7 @@ Each bond maintains a collection of *subscribers*. These are individuals who
 are affiliated with the subscriber account and are authorized, based on the
 bond, to request services from the host account.
 
-The data model looks something like this:
+An example bond record looks something like this:
 
 ```json
 {
@@ -57,13 +57,48 @@ Docker and Docker Compose
 AWS CLI
 ```
 
-## Running It Locally
+## Development Environment
+
+Create a Python virtual environment on your local machine. For example, if you
+are using venv, run the following from the top-level project directory:
+
+To create the environment: ```python3 -m venv .venv```
+
+To activate it: ```source .venv/bin/activate```
+
+To deactivate it: ```deactivate```
+
+To install the packages needed, run: ```pip install -r requirements.txt```
+
+## Testing
+### Linting
+To test PEP8 compliance, run:
+```shell script
+pycodestyle --show-source --show-pep8 registry/ tests/
+```
+
+### Unit Tests
+
+To run unit tests execute: ```python -m pytest tests/unit/test_*```
+
+### Integration Tests
+
+We use the ```testcontainers``` package to launch docker containers for the registry service and dynamodb
+back end that make up the test environment. It takes a few seconds to launch and testing pauses until the environment
+is ready. Once the tests have run to completion, the containers are shut down.
+
+*Make sure Docker is running on your machine before you run the tests or they will fail.*
+
+To run integration tests execute: ```python -m pytest tests/integration/test_*```
+
+
+## Running It All Locally
 
 The amazon/dynamodb-local image has been added to `docker-compose.yml`
 
 In production, the DynamoDB table will have been created via Terraform, so
 our code will expect a table to be there already. Locally, I will run a shell
-script once the container has been brought up to create the table and populate 
+script once the container has been brought up to create the table and populate
 it with some test data.
 
 The directory structure for all this looks like this:
@@ -121,7 +156,7 @@ I can view the OpenAPI docs at `http://localhost:5000/docs`.
 
 I tail the server logs with `docker logs --follow bond-registry`.
 
-I bring it all down with `docker-compose down`.
+I bring it all down with `docker-compose down -v`.
 
 ### (Optional) Running Some Queries Against the Local DynamoDB Instance
 Here are some queries to play with the local DynamoDB environment:
@@ -147,7 +182,7 @@ AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY \
 aws dynamodb query \
     --table-name bond \
     --key-condition-expression "bond_id = :v1" \
-    --expression-attribute-values "{ \":v1\" : { \"S\" : \"TEST007\" } }" \
+    --expression-attribute-values "{ \":v1\" : { \"S\" : \"FOO\" } }" \
 	--endpoint-url http://0.0.0.0:8000 --region us-west-2
 ```
 
@@ -159,36 +194,3 @@ aws dynamodb scan \
     --table-name bond \
 	--endpoint-url http://0.0.0.0:8000 --region us-west-2
 ```
-
-
-## Development
-
-Create a Python virtual environment on your local machine. For example, if you
-are using venv, run the following from the top-level project directory:
-
-To create the environment: ```python3 -m venv .venv```
-
-To activate it: ```source .venv/bin/activate```
-
-To deactivate it: ```deactivate```
-
-To install the packages needed, run: ```pip install -r requirements.txt```
-
-## Testing
-### Linting
-To test PEP8 compliance, run:
-```shell script
-pycodestyle --show-source --show-pep8 registry/ tests/
-```
-
-### Unit Tests
-
-To run unit tests execute: ```python -m pytest tests/unit/test_*```
-
-### Integration Tests
-
-We use the ```testcontainers``` package to launch docker containers for the registry service and dynamodb
-back end that make up the test environment. It takes a few seconds to launch and testing pauses until the environment 
-is ready. Once the tests have run to completion, the containers are shut down.
-
-To run integration tests execute: ```python -m pytest tests/integration/test_*```
