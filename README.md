@@ -58,7 +58,6 @@ AWS CLI
 ```
 
 ## Development Environment
-
 Create a Python virtual environment on your local machine. For example, if you
 are using venv, run the following from the top-level project directory:
 
@@ -69,6 +68,8 @@ To activate it: ```source .venv/bin/activate```
 To deactivate it: ```deactivate```
 
 To install the packages needed, run: ```pip install -r requirements.txt```
+
+The source code for the application is in the ```registry``` directory.
 
 ## Testing
 ### Linting
@@ -194,3 +195,5 @@ aws dynamodb scan \
     --table-name bond \
 	--endpoint-url http://0.0.0.0:8000 --region us-west-2
 ```
+
+### (Optional) Running the Registry in Pycharm
