@@ -1,5 +1,5 @@
 pip==20.0.2
-fastapi==0.47.1
+fastapi==0.65.2
 uvicorn==0.11.7
 PyYAML==5.3
 email-validator==1.0.5
