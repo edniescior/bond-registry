@@ -1,4 +1,4 @@
-pip==20.0.2
+pip==21.1
 fastapi==0.65.2
 uvicorn==0.11.7
 PyYAML==5.4
